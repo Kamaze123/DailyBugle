@@ -25,7 +25,7 @@ llm = ChatGroq(
 prompt_template = """
     You are a news assistant. Answer the question using ONLY the news articles provided below.
     If the answer is not in the articles, say "I don't have recent news on that topic."
-    Always mention which source the information came from. Have a slight sense of humour too
+    Always mention which source the information came from. Have a slight sense of humour.
 
     News Context:
     {context}
@@ -72,7 +72,7 @@ def ask(question : str) -> dict:
     }
 
 if __name__ == "__main__":
-    response = ask("What is up in Japan ?")
+    response = ask("Wait is Wall Street being nice to mamdani ?")
     print(f"\nAnswer : {response["answer"]}")
     print(f"\nSources : {response["sources"]}")
     
