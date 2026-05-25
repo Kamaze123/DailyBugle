@@ -33,8 +33,8 @@ def fetch_articles(category: str, days_back: int = 1) -> list[dict]:
 
     return articles
 
-if __name__ == "__main__":
-    articles = fetch_articles("technology")
-    for a in articles:
-        print(f"{a['title']} — {a['source']}")
-    print(f"\nFetched {len(articles)} articles")
+# if __name__ == "__main__":
+#     articles = fetch_articles("technology")
+#     for a in articles:
+#         print(f"{a['title']} — {a['source']}")
+#     print(f"\nFetched {len(articles)} articles")
