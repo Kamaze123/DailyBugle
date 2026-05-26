@@ -101,34 +101,30 @@ def trigger_pipeline():
     
 @app.get("/articles/today")
 def get_todays_articles():
-    today = date.today().isoformat()
-    all_data = vectorstore.get(include=["metadatas", "documents"])
+    all_data = vectorstore.get(include=["metadatas"])
 
-    # try today first, fall back to latest available date
-    def filter_by_date(target_date):
-        seen_urls = set()
-        articles = []
-        for meta, doc in zip(all_data["metadatas"], all_data["documents"]):
-            url = meta.get("url", "")
-            if meta.get("published_at", "").startswith(target_date) and url not in seen_urls:
-                seen_urls.add(url)
-                articles.append(meta)
-        return articles
-
-    articles = filter_by_date(today)
+    # dedupe by URL
+    seen_urls = set()
+    articles = []
+    for meta in all_data["metadatas"]:
+        url = meta.get("url", "")
+        if url not in seen_urls:
+            seen_urls.add(url)
+            articles.append(meta)
 
     if not articles:
-        # find the most recent date in the DB
-        dates = [m.get("published_at", "")[:10] for m in all_data["metadatas"] if m.get("published_at")]
-        if not dates:
-            raise HTTPException(status_code=404, detail="No articles in database yet.")
-        latest = max(dates)
-        articles = filter_by_date(latest)
+        raise HTTPException(status_code=404, detail="No articles in database yet.")
 
-    # group by category
+    # group by category, sort by date, take top 5
     grouped = {}
     for article in articles:
         cat = article.get("category", "uncategorized").lower()
         grouped.setdefault(cat, []).append(article)
 
-    return {"total": len(articles), "sections": grouped}
+    grouped = {
+        cat: sorted(arts, key=lambda x: x.get("published_at", ""), reverse=True)[:6]
+        for cat, arts in grouped.items()
+    }
+
+    total = sum(len(arts) for arts in grouped.values())
+    return {"total": total, "sections": grouped}

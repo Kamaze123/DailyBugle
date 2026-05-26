@@ -28,8 +28,6 @@ def run_pipeline():
     print(f"Pipeline complete - {len(all_summarized)} articles completed")
     return all_summarized
 
-if __name__ == "__main__":
-    run_pipeline()
 
 
 

@@ -40,14 +40,9 @@ function Message({ msg }) {
   );
 }
 
-export default function ChatPage() {
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content: "Hey! Ask me anything about today's news. I'll search through the latest articles and give you a grounded answer.",
-      time: now(),
-    },
-  ]);
+export default function ChatPage({ chatHistory, setChatHistory }) {
+  const messages = chatHistory;
+  const setMessages = setChatHistory;
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
@@ -118,7 +113,6 @@ export default function ChatPage() {
         <div>
           <p className="chat-header-name">Daily Bugle</p>
           <p className="chat-header-status">
-            <span className="status-dot" />
             Answering from today's news
           </p>
         </div>
