@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import asyncio
+from datetime import date
+from config import CHROMA_DB_PATH, EMBEDDING_MODEL
+from langchain_chroma import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+from embedder import vectorstore
  
 from rag import ask
 from pipeline import run_pipeline
@@ -94,23 +99,36 @@ def trigger_pipeline():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@app.get("/articles/grouped")
-def get_articles_grouped():
-    """Returns articles grouped by category"""
-    if not article_store:
-        raise HTTPException(
-            status_code=404,
-            detail="No articles loaded yet. Run /pipeline/run first."
-        )
+@app.get("/articles/today")
+def get_todays_articles():
+    today = date.today().isoformat()
+    all_data = vectorstore.get(include=["metadatas", "documents"])
 
+    # try today first, fall back to latest available date
+    def filter_by_date(target_date):
+        seen_urls = set()
+        articles = []
+        for meta, doc in zip(all_data["metadatas"], all_data["documents"]):
+            url = meta.get("url", "")
+            if meta.get("published_at", "").startswith(target_date) and url not in seen_urls:
+                seen_urls.add(url)
+                articles.append({**meta, "summary": doc})
+        return articles
+
+    articles = filter_by_date(today)
+
+    if not articles:
+        # find the most recent date in the DB
+        dates = [m.get("published_at", "")[:10] for m in all_data["metadatas"] if m.get("published_at")]
+        if not dates:
+            raise HTTPException(status_code=404, detail="No articles in database yet.")
+        latest = max(dates)
+        articles = filter_by_date(latest)
+
+    # group by category
     grouped = {}
-    for article in article_store:
-        category = article.get("category", "uncategorized").lower()
-        if category not in grouped:
-            grouped[category] = []
-        grouped[category].append(article)
+    for article in articles:
+        cat = article.get("category", "uncategorized").lower()
+        grouped.setdefault(cat, []).append(article)
 
-    return {
-        "total": len(article_store),
-        "sections": grouped
-    }
+    return {"total": len(articles), "sections": grouped}

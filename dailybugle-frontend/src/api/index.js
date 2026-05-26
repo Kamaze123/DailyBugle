@@ -5,8 +5,8 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-export const fetchGroupedArticles = async () => {
-  const res = await api.get("/articles/grouped");
+export const fetchTodaysArticles = async () => {
+  const res = await api.get("/articles/today");
   return res.data;
 };
 

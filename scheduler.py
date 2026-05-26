@@ -8,3 +8,6 @@ scheduler = BlockingScheduler()
 def scheduled_job():
     print(f"scheduled run at {datetime.now()}")
     run_pipeline()
+
+if __name__ == "__main__":
+    scheduled_job()

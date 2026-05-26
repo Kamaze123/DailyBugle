@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ArticleCard from "../components/ArticleCard";
-import { fetchGroupedArticles } from "../api";
+import { fetchTodaysArticles } from "../api";
 import "./DigestPage.css";
 
 export default function DigestPage() {
@@ -12,7 +12,7 @@ export default function DigestPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchGroupedArticles();
+        const data = await fetchTodaysArticles();
         setSections(data.sections);
         setTotal(data.total);
       } catch (err) {
