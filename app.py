@@ -5,18 +5,27 @@ from typing import Optional
 import asyncio
 from datetime import date
 from config import CHROMA_DB_PATH, EMBEDDING_MODEL
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from embedder import vectorstore
- 
+from contextlib import asynccontextmanager
+from apscheduler.schedulers.background import BackgroundScheduler
 from rag import ask
 from pipeline import run_pipeline
 from config import CATEGORIES
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(run_pipeline, "cron", hour=7, minute=0)
+    scheduler.start()
+    print("Scheduler started — pipeline runs daily at 7am")
+    yield
+    scheduler.shutdown()
  
 app = FastAPI(
     title="DailyBugle API",
     description="AI-powered news summarizer and Q&A backend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
  
 # ---- CORS ---- (allows React frontend to talk to this backend)
