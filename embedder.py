@@ -12,6 +12,8 @@ vectorstore = Chroma(
     embedding_function=embeddings
 )
 
+
+
 def chunk_and_store(articles: list[dict]):
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
@@ -37,6 +39,7 @@ def chunk_and_store(articles: list[dict]):
                 "url": article["url"],
                 "category": article["category"],
                 "published_at": article["published_at"],
+                "summary": article.get("summary", ""),
             })
             all_ids.append(chunk_id)
 
@@ -62,4 +65,5 @@ def purge_old_articles(days: int):
         print("Nothing to purge")
 
 if __name__ == "__main__":
-    print(vectorstore._collection.count())  
+    count = vectorstore._collection.count()
+    print(count)

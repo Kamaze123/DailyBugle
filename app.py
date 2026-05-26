@@ -112,7 +112,7 @@ def get_todays_articles():
             url = meta.get("url", "")
             if meta.get("published_at", "").startswith(target_date) and url not in seen_urls:
                 seen_urls.add(url)
-                articles.append({**meta, "summary": doc})
+                articles.append(meta)
         return articles
 
     articles = filter_by_date(today)

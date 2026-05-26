@@ -16,7 +16,7 @@ export default function DigestPage() {
         setSections(data.sections);
         setTotal(data.total);
       } catch (err) {
-        setError("No articles yet. Hit Refresh to fetch today's news.");
+        setError("Loading your articles...");
       } finally {
         setLoading(false);
       }

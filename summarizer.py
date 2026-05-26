@@ -1,22 +1,25 @@
 from dotenv import load_dotenv
 import os
 from langchain_groq import ChatGroq
+import re
 
 load_dotenv()
 
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     api_key=os.getenv("GROQ_API_KEY"),
-    max_tokens=200
+    max_tokens=300
 )
 
+def clean_content(text: str) -> str:
+    return re.sub(r'\[\+\d+ chars\]', '', text).strip()
 
 def summarize_article(article: dict) -> dict:
     prompt = f"""Summarize this news article in exactly 3 sentences.
-Be concise and factual. No opinions.
+Be concise and factual. No opinions. No em-dashes.
 
 Title: {article['title']}
-Content: {article['content']}
+Content: {clean_content(article['content'])}
 
 3 sentence summary:"""
 
