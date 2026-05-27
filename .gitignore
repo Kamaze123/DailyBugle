@@ -1,3 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
 .env
-__pycache__
-chroma_db
+chroma_db/
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
