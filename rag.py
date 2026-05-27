@@ -1,37 +1,31 @@
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from embedder import vectorstore
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from config import CHROMA_DB_PATH, EMBEDDING_MODEL
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-vectorstore = Chroma(
-    persist_directory=CHROMA_DB_PATH,
-    embedding_function=embeddings
-)
-
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     api_key=os.getenv("GROQ_API_KEY"),
-    max_tokens=200
+    max_tokens=500
 )
 
 prompt_template = """
-    You are a news assistant. Answer the question using ONLY the news articles provided below.
-    If the answer is not in the articles, say "I don't have recent news on that topic."
-    Have a slight sense of humour. 
-    News Context:
-    {context}
+You are a news assistant. Answer the question using ONLY the news articles provided below.
+If the answer is not in the articles, say "I don't have recent news on that topic."
+Have a slight sense of humour.
 
-    Question:
-    {question}
-    Answer:
+News Context:
+{context}
+
+Question:
+{question}
+
+Answer:
 """
 
 prompt = PromptTemplate(
@@ -54,9 +48,9 @@ qa_chain = (
     | StrOutputParser()
 )
 
-def ask(question : str) -> dict:
-    docs = retriever.invoke(question)
 
+def ask(question: str) -> dict:
+    docs = retriever.invoke(question)
     result = qa_chain.invoke(question)
 
     sources = list(set([
@@ -64,14 +58,13 @@ def ask(question : str) -> dict:
         for doc in docs
     ]))
 
-
-    return{
-        "answer" : result,
-        "sources" : sources
+    return {
+        "answer": result,
+        "sources": sources
     }
 
+
 if __name__ == "__main__":
-    response = ask("Wait is Wall Street being nice to mamdani ?")
-    print(f"\nAnswer : {response["answer"]}")
-    print(f"\nSources : {response["sources"]}")
-    
+    response = ask("What is the latest news in technology?")
+    print(f"\nAnswer: {response['answer']}")
+    print(f"\nSources: {response['sources']}")
