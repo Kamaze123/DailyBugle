@@ -21,6 +21,7 @@ def run_pipeline():
 
         print("Chunking and storing articles...\n")
         chunk_and_store(summarized)
+        #can make a change over here
         # we are adding the summarized articles to DB, not the entire articles
 
         all_summarized.extend(summarized)
