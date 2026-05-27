@@ -10,4 +10,4 @@ pydantic==2.13.4
 python-dotenv==1.2.2
 qdrant_client==1.18.0
 uvicorn
-sentence-transformers
+langchain_community

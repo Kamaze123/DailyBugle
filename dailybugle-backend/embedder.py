@@ -1,9 +1,9 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
-from config import CHUNK_SIZE, CHUNK_OVERLAP, EMBEDDING_MODEL
+from config import CHUNK_SIZE, CHUNK_OVERLAP
 from dotenv import load_dotenv
 import hashlib
 import os
@@ -13,7 +13,10 @@ load_dotenv()
 COLLECTION_NAME = "dailybugle"
 VECTOR_SIZE = 384  # HuggingFace all-mpnet-base-v2 output size
 
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+embeddings = HuggingFaceEndpointEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    huggingfacehub_api_token=os.getenv("HF_API_KEY")
+)
 
 client = QdrantClient(
     url=os.getenv("QDRANT_URL"),
