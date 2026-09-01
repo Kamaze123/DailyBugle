@@ -2,7 +2,6 @@
 
 An AI-powered news aggregator that fetches, summarizes, and lets you chat with today's headlines. Built with FastAPI, React, and a full RAG (Retrieval-Augmented Generation) pipeline.
 
-**Live Demo:** [daily-bugle-mu.vercel.app](https://daily-bugle-mu.vercel.app)
 
 ---
 
